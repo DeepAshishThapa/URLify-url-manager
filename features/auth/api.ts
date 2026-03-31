@@ -12,3 +12,13 @@ export function signup(data:{
 
 
 }
+
+export function verification(data:{
+    email:string,
+    code: string
+}){
+    return apiClient ("/api/verify-code",{
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+}
