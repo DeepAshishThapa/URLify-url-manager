@@ -1,13 +1,10 @@
-import Login from "@/components/Login"
+import Signup from "@/components/Signup"
 
 function page() {
-    
-
     return (
         <div className='w-full h-[90vh] flex justify-center items-center'>
-            <Login />
-           
-
+            <Signup/>
+            
 
         </div>
     )
