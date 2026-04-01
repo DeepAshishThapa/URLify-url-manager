@@ -19,7 +19,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
-import { verifySchema } from "@/schemas/VerifySchema";
+import { verifySchema } from '@/schemas/verifySchema';
 import { verification } from "@/features/auth/api";
 
 
@@ -41,7 +41,7 @@ export default function VerifyAccount() {
             //  SUCCESS TOAST
             toast.success(response.message);
 
-            router.replace('/login');
+            router.replace('/');
 
         } catch (error: any) {
             // ERROR TOAST
@@ -52,9 +52,9 @@ export default function VerifyAccount() {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-                <div className="text-center">
+        <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-black">
+            <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-gray-900 rounded-lg shadow-md">
+                <div className="text-center text-black dark:text-white">
                     <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
                         Verify Your Account
                     </h1>
