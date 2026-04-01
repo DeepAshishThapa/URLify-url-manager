@@ -17,8 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { signInSchema } from "@/schemas/signInSchema"
 
 import { z } from "zod"
-import {useSession,signIn} from "next-auth/react"
-import { useEffect,useState } from "react"
+import { useSession, signIn } from "next-auth/react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -57,7 +57,13 @@ function Login() {
 
             if (result?.error) {
                 setStatus("error")
-                setMessage(result.error)
+
+                if (result.error === "Configuration") {
+                    setMessage("Invalid email or password")
+                } else {
+                    setMessage("Something went wrong")
+                }
+
                 return
             }
 
@@ -107,6 +113,7 @@ function Login() {
                                 id="identifier"
                                 type="text"
                                 placeholder="Enter email"
+                                required
                                 {...register("identifier")}
                             />
                             {errors.identifier && (
@@ -122,6 +129,7 @@ function Login() {
                             <Input
                                 id="password"
                                 type="password"
+                                required
                                 {...register("password")}
                             />
                             {errors.password && (
