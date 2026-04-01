@@ -18,11 +18,11 @@ import { useForm } from "react-hook-form"
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SignupSchema } from '@/schemas/SignupSchema'
+import { signUpSchema } from '@/schemas/signUpSchema'
 import { signup } from '@/features/auth/api'
 
 
-type Inputs = z.infer<typeof SignupSchema>
+type Inputs = z.infer<typeof signUpSchema>
 
 
 function Signup() {
@@ -39,7 +39,7 @@ function Signup() {
         formState: { errors, isSubmitting },
 
     } = useForm<Inputs>({
-        resolver: zodResolver(SignupSchema)
+        resolver: zodResolver(signUpSchema)
     })
 
     const onSubmit = async (data: Inputs) => {
