@@ -1,90 +1,71 @@
 import NextAuth from "next-auth"
+import Google from "next-auth/providers/google"
 
-
-import Credentials from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
 import dbConnect from "@/lib/dbConnect"
 import UserModel from "@/model/user.model"
 
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    providers: [
-        Credentials({
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+    })
+  ],
 
-            credentials: {
-                email: {},
-                password: {}
-            },
-            
-            authorize: async (credentials) => {
-                await dbConnect()
+  session: {
+    strategy: "jwt"
+  },
 
-                if (!credentials) return null
+  callbacks: {
+    async jwt({ token, account, profile }) {
+      // 🔥 Runs when user logs in (OAuth)
+      if (account && profile) {
+        await dbConnect()
 
-                const email = credentials.email as string
-                const password = credentials.password as string
-
-                const user = await UserModel.findOne({
-                    email
-                })
-
-                if (!user) {
-                    throw new Error("User not found")
-                }
-
-                if (!user.isVerified) {
-                    throw new Error("Please verify your account first")
-                }
-
-                const isValid = await bcrypt.compare(
-                    password,
-                    user.password
-                )
-
-                if (!isValid) {
-                    throw new Error("Invalid Password")
-                }
-
-                return {
-                    id: user._id.toString(),
-                    email: user.email,
-                    username: user.username,
-                    isVerified: user.isVerified,
-
-                }
-            }
-        })
-    ],
-    session: {
-        strategy: "jwt"
-    },
-
-    callbacks: {
-
-        async jwt({ token, user }) {
-            if (user) {
-                token._id = user.id,
-                    token.username = user.username,
-                    token.isVerified = user.isVerified,
-                    token.email = user.email
-            }
-
-            return token
-        },
-
-        async session({ session, token }) {
-            session.user._id = token._id as string,
-                session.user.username = token.username as string,
-                session.user.isVerified = token.isVerified as boolean
-
-
-            return session
+        //  Safety check (VERY IMPORTANT)
+        if (!profile.email) {
+          throw new Error("No email provided by Google")
         }
+
+        //  Find existing user
+        let user = await UserModel.findOne({
+          email: profile.email
+        })
+
+        //  Create new user if not exists
+        if (!user) {
+          user = await UserModel.create({
+            email: profile.email,
+            username: profile.name || "user",
+            isVerified: true, // OAuth = trusted
+            provider: "google"
+          })
+        }
+
+        //  Attach data to token
+        token._id = user._id.toString()
+        token.username = user.username
+        token.email = user.email
+      }
+
+      return token
     },
 
-    pages: {
-        signIn: "/sign-in"
-    },
+    async session({ session, token }) {
+      //  Attach custom fields to session
+      if (session.user) {
+        session.user._id = token._id as string
+        session.user.username = token.username as string
+        session.user.email = token.email as string
+      }
 
-    secret: process.env.AUTH_SECRET
+      return session
+    }
+  },
+
+  pages: {
+    signIn: "/sign-in"
+  },
+
+  secret: process.env.AUTH_SECRET
 })
