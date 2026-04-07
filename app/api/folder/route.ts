@@ -79,12 +79,12 @@ export async function POST(req: NextRequest) {
     }
     catch (err: any) {
         //Duplicate folder name 
-        if (err.code === 11000) {
-            return NextResponse.json(
-                { message: "Folder with this name already exists" },
-                { status: 400 }
-            );
-        }
+        // if (err.code === 11000) {
+        //     return NextResponse.json(
+        //         { message: "Folder with this name already exists" },
+        //         { status: 400 }
+        //     );
+        // }
 
         return NextResponse.json(
             {message: "Error creating folder"},
