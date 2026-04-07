@@ -5,6 +5,7 @@ export async function apiClient(
     options?: RequestInit
 ) {
     const res = await fetch(`${BASE_URL}${url}`, {
+        credentials: "include",
         headers: {
             "Content-Type": "application/json"
         },
