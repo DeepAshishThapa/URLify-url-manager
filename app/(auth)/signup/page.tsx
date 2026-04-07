@@ -1,13 +1,7 @@
-import Signup from "@/components/Signup"
+
 
 function page() {
-    return (
-        <div className='w-full h-[90vh] flex justify-center items-center'>
-            <Signup/>
-            
-
-        </div>
-    )
+    return null
 }
 
 export default page
