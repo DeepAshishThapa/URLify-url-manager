@@ -1,155 +1,49 @@
 "use client"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Label } from '@radix-ui/react-label'
+import { Button } from "@/components/ui/button"
+import { signIn } from "next-auth/react"
+import { useState } from "react"
 
-import { useForm, SubmitHandler } from 'react-hook-form'
-import { zodResolver } from "@hookform/resolvers/zod"
-import { signInSchema } from "@/schemas/signInSchema"
+export default function LoginPage() {
+  const [loading, setLoading] = useState(false)
 
-import { z } from "zod"
-import { useSession, signIn } from "next-auth/react"
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-
-type Inputs = z.infer<typeof signInSchema>
-
-function Login() {
-    const [status, setStatus] = useState<"success" | "error" | null>(null)
-    const [message, setMessage] = useState("")
-
-    const router = useRouter()
-    const { data: session } = useSession()
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<Inputs>({
-        resolver: zodResolver(signInSchema)
-    })
-
-    // ✅ Auto redirect if already logged in
-    useEffect(() => {
-        if (session) {
-            router.push("/home")
-        }
-    }, [session, router])
-
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        try {
-            const result = await signIn("credentials", {
-                redirect: false,
-                email: data.identifier,
-                password: data.password,
-            })
-
-            if (result?.error) {
-                setStatus("error")
-
-                if (result.error === "Configuration") {
-                    setMessage("Invalid email or password")
-                } else {
-                    setMessage("Something went wrong")
-                }
-
-                return
-            }
-
-            setStatus("success")
-
-            setTimeout(() => {
-                router.push("/home")
-            }, 1200)
-
-        } catch (error: any) {
-            setStatus("error")
-            setMessage("Something went wrong")
-        }
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true)
+      await signIn("google", { callbackUrl: "/home" })
+    } catch (error) {
+      setLoading(false)
     }
+  }
 
-    return (
-        <Card className="w-full max-w-lg">
-            <CardHeader>
-                <CardTitle>Login to your account</CardTitle>
-                <CardDescription>
-                    Enter your credentials to login
-                </CardDescription>
-            </CardHeader>
+  return (
+    <div className="w-full max-w-md p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl">
 
-            <CardContent>
-                {status && (
-                    <Alert
-                        variant={status === "error" ? "destructive" : "default"}
-                        className="mb-4"
-                    >
-                        <AlertTitle>
-                            {status === "success" ? "Login successful" : message}
-                        </AlertTitle>
-                        <AlertDescription>
-                            {status === "success" && "Redirecting you to home..."}
-                        </AlertDescription>
-                    </Alert>
-                )}
+      {/* Title */}
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-semibold text-white">
+          Welcome back
+        </h1>
+        <p className="text-sm text-zinc-400 mt-2">
+          Continue with Google to access your account
+        </p>
+      </div>
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex flex-col gap-6">
+      {/* Google Button */}
+      <Button
+        onClick={handleGoogleLogin}
+        disabled={loading}
+        className="w-full h-12 text-sm font-medium bg-white text-black hover:bg-gray-200 transition-all flex items-center justify-center gap-3 rounded-lg hover:scale-[1.02] active:scale-[0.98]"
+      >
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="google"
+          className="w-5 h-5"
+        />
 
-                        {/* Identifier */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="identifier">Email </Label>
-                            <Input
-                                id="identifier"
-                                type="text"
-                                placeholder="Enter email"
-                                required
-                                {...register("identifier")}
-                            />
-                            {errors.identifier && (
-                                <p className="text-sm text-red-500">
-                                    {errors.identifier.message}
-                                </p>
-                            )}
-                        </div>
+        {loading ? "Redirecting..." : "Continue with Google"}
+      </Button>
 
-                        {/* Password */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                required
-                                {...register("password")}
-                            />
-                            {errors.password && (
-                                <p className="text-sm text-red-500">
-                                    {errors.password.message}
-                                </p>
-                            )}
-                        </div>
-
-                    </div>
-
-                    <CardFooter className="flex-col gap-2 mt-10">
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
-                            {isSubmitting ? "Logging in..." : "Login"}
-                        </Button>
-                    </CardFooter>
-                </form>
-            </CardContent>
-        </Card>
-    )
+    </div>
+  )
 }
-
-export default Login
