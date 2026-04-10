@@ -20,7 +20,6 @@ import {
   createFolder,
   updateFolder,
   deleteFolder
-  
  } from "@/features/folderService/api"
 
 type Folder = {
@@ -31,6 +30,7 @@ type Folder = {
 
 type ActiveView =
   | { type: "all" }
+  | { type: "unsaved" }   // ✅ added
   | { type: "folder"; folderId: string }
 
 export default function Menubar() {
@@ -133,7 +133,7 @@ export default function Menubar() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover:cursor-pointer">
           <Menu className="w-5 h-5 ml-2" />
         </Button>
       </SheetTrigger>
@@ -154,6 +154,17 @@ export default function Menubar() {
             }}
           >
             All
+          </Button>
+
+          <Button
+            variant={activeView.type === "unsaved" ? "secondary" : "ghost"}  // ✅ highlight added
+            className="w-full justify-start"
+            onClick={() => {
+              setActiveView({ type: "unsaved" }) // ✅ set active
+              router.push("/folders/unsaved")
+            }}
+          >
+            Unsaved
           </Button>
         </div>
 
@@ -190,8 +201,14 @@ export default function Menubar() {
                 <div key={folder._id} className="flex items-center gap-1">
                   <Button
                     className="flex-1 justify-start"
-                    variant="ghost"
+                    variant={
+                      activeView.type === "folder" &&
+                      activeView.folderId === folder._id
+                        ? "secondary"
+                        : "ghost"
+                    }
                     onClick={() => {
+                      setActiveView({ type: "folder", folderId: folder._id })
                       router.push(`/folders/${folder._id}`)
                     }}
                   >

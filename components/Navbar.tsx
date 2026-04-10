@@ -21,10 +21,14 @@ export default function Navbar() {
 
       {/* LEFT */}
       <div className="flex items-center gap-5">
-        <div className="font-semibold text-lg">URLify</div>
+        
+        {/*  HIDE ON MOBILE */}
+        <div className="font-semibold text-lg hidden sm:block">
+          URLify
+        </div>
 
         {/*  SHOW MENUBAR ONLY WHEN LOGGED IN */}
-        {authStatus && <Menubar />}
+        {authStatus && <Menubar/>}
       </div>
 
       {/* RIGHT */}
@@ -40,11 +44,11 @@ export default function Navbar() {
 
         {/* AUTH BUTTON */}
         {!authStatus ? (
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="hover:cursor-pointer">
             <Link href="/login">Login</Link>
           </Button>
         ) : (
-          <Button onClick={handleLogout} size="lg">
+          <Button onClick={handleLogout} size="lg" className="hover:cursor-pointer">
             Logout
           </Button>
         )}
