@@ -136,3 +136,49 @@ export async function DELETE(
     )
   }
 }
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ folderId: string }> }
+) {
+  try {
+    await dbConnect()
+
+    const session = await auth()
+
+    if (!session || !session.user?._id) {
+      return NextResponse.json(
+        { message: "Unauthorized access" },
+        { status: 401 }
+      )
+    }
+
+    const { folderId } = await params
+
+    if (!mongoose.Types.ObjectId.isValid(folderId)) {
+      return NextResponse.json(
+        { message: "invalid folder id" },
+        { status: 400 }
+      )
+    }
+
+    const folder=await folderModel.findById(folderId)
+
+    return NextResponse.json(
+      {data:folder},
+      {status:200}
+
+    )
+
+
+
+  }
+  catch (error) {
+    return NextResponse.json(
+      {message: "Error fetching folder"},
+      {status:500}
+    )
+
+  }
+
+}
