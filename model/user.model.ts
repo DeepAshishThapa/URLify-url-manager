@@ -6,7 +6,8 @@ export interface UserObject extends mongoose.Document {
     password: string,
     verifyCode: string,
     isVerified: boolean,
-      verifyCodeExpiry: Date;
+    verifyCodeExpiry: Date;
+    provider: "credentials" | "google"
 
 }
 
@@ -18,21 +19,22 @@ const userSchema: Schema<UserObject> = new Schema(
             trim: true,
             unique: true
         },
+
         email: {
             type: String,
             required: [true, 'Email is required'],
             unique: true,
-            match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please use a valid email address']
+
         },
         password: {
             type: String,
-            required: [true, 'Password is required'],
+            required: false,
 
 
         },
         verifyCode: {
             type: String,
-            required: [true, 'Verify Code Expiry is required']
+            required: false
         },
         isVerified: {
             type: Boolean,
@@ -40,7 +42,12 @@ const userSchema: Schema<UserObject> = new Schema(
         },
         verifyCodeExpiry: {
             type: Date,
-            required: [true, 'Verify Code Expiry is required'],
+            required: false,
+        },
+        provider: {
+            type: String,
+            enum: ["credentials", "google"],
+            default: "credentials"
         }
 
     }
