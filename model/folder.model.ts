@@ -2,7 +2,8 @@ import mongoose, { Schema } from "mongoose";
 
 export interface FolderObject extends mongoose.Document {
     name: string,
-    userId: mongoose.Types.ObjectId
+    userId: mongoose.Types.ObjectId,
+    folderId?: mongoose.Types.ObjectId
 }
 
 const folderSchema: Schema<FolderObject> = new Schema(
@@ -21,6 +22,10 @@ const folderSchema: Schema<FolderObject> = new Schema(
     },
     { timestamps: true }
 )
+
+// prevent duplicate folder names per user
+// folderSchema.index({ name: 1, userId: 1 }, { unique: true });
+
 
 const folderModel = (mongoose.models.Folder as mongoose.Model<FolderObject>) ||
     mongoose.model<FolderObject>('Folder', folderSchema);
