@@ -5,15 +5,32 @@ import { Button } from "@/components/ui/button"
 import { User } from "lucide-react"
 import { useSession, signOut } from "next-auth/react"
 import Menubar from "./Menubar" 
+import { useRouter } from "next/navigation"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function Navbar() {
   const { data: session, status } = useSession()
+
+  const router = useRouter()
 
   const authStatus = status === "authenticated"
   const userName = session?.user?.name ?? ""
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" })
+      await signOut({ redirect: false })  // don't auto redirect
+  router.replace("/")  
+  router.refresh()               
   }
 
   return (
@@ -21,20 +38,16 @@ export default function Navbar() {
 
       {/* LEFT */}
       <div className="flex items-center gap-5">
-        
-        {/*  HIDE ON MOBILE */}
         <div className="font-semibold text-lg hidden sm:block">
           URLify
         </div>
 
-        {/*  SHOW MENUBAR ONLY WHEN LOGGED IN */}
-        {authStatus && <Menubar/>}
+        {authStatus && <Menubar />}
       </div>
 
       {/* RIGHT */}
       <div className="flex items-center gap-5">
 
-        {/* USER INFO */}
         {authStatus && (
           <div className="flex gap-2 items-center">
             <User size={18} />
@@ -42,15 +55,36 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* AUTH BUTTON */}
         {!authStatus ? (
           <Button asChild size="lg" className="hover:cursor-pointer">
             <Link href="/login">Login</Link>
           </Button>
         ) : (
-          <Button onClick={handleLogout} size="lg" className="hover:cursor-pointer">
-            Logout
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="lg" className="hover:cursor-pointer">
+                Logout
+              </Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to logout?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  You will need to log in again to access your account.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleLogout}>
+                  Yes, logout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
 
       </div>
