@@ -39,7 +39,7 @@ const linkSchema: Schema<LinkObject> = new Schema(
     { timestamps: true }
 )
     
-const linkModel = (mongoose.models.link as mongoose.Model<LinkObject>) ||
+const linkModel = (mongoose.models.Link as mongoose.Model<LinkObject>) ||
     mongoose.model<LinkObject>('Link', linkSchema );
 
 export default linkModel
