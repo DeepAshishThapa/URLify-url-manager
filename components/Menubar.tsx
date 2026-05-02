@@ -14,13 +14,24 @@ import { Menu, Plus, Trash2, Pencil, Check, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 
-//  IMPORT SERVICE
-import { 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+import {
   getAllFolders,
   createFolder,
   updateFolder,
   deleteFolder
- } from "@/features/folderService/api"
+} from "@/features/folderService/api"
 
 type Folder = {
   _id: string
@@ -30,7 +41,7 @@ type Folder = {
 
 type ActiveView =
   | { type: "all" }
-  | { type: "unsaved" }   // ✅ added
+  | { type: "unsaved" }
   | { type: "folder"; folderId: string }
 
 export default function Menubar() {
@@ -48,7 +59,6 @@ export default function Menubar() {
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState("")
 
-  // -------------------- FETCH --------------------
   useEffect(() => {
     if (!userId) return
 
@@ -64,7 +74,6 @@ export default function Menubar() {
     fetchFolders()
   }, [userId])
 
-  // -------------------- ADD --------------------
   async function handleAddFolder() {
     const name = folderName.trim()
     if (!name) return
@@ -80,7 +89,6 @@ export default function Menubar() {
     }
   }
 
-  // -------------------- RENAME --------------------
   async function saveRename() {
     if (!editingFolderId) return
 
@@ -103,7 +111,6 @@ export default function Menubar() {
     }
   }
 
-  // -------------------- DELETE --------------------
   async function handleDeleteFolder(id: string) {
     try {
       await deleteFolder(id)
@@ -129,7 +136,6 @@ export default function Menubar() {
     setEditingName("")
   }
 
-  // -------------------- UI --------------------
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -143,7 +149,6 @@ export default function Menubar() {
           <SheetTitle>Folders</SheetTitle>
         </SheetHeader>
 
-        {/* ALL */}
         <div className="mt-6 space-y-2">
           <Button
             variant={activeView.type === "all" ? "secondary" : "ghost"}
@@ -157,10 +162,10 @@ export default function Menubar() {
           </Button>
 
           <Button
-            variant={activeView.type === "unsaved" ? "secondary" : "ghost"}  // ✅ highlight added
+            variant={activeView.type === "unsaved" ? "secondary" : "ghost"}
             className="w-full justify-start"
             onClick={() => {
-              setActiveView({ type: "unsaved" }) // ✅ set active
+              setActiveView({ type: "unsaved" })
               router.push("/folders/unsaved")
             }}
           >
@@ -168,7 +173,6 @@ export default function Menubar() {
           </Button>
         </div>
 
-        {/* USER FOLDERS */}
         <div className="mt-6">
           <div className="flex justify-between mb-2">
             <p className="text-sm font-medium">Your folders</p>
@@ -237,12 +241,33 @@ export default function Menubar() {
                     </Button>
                   )}
 
-                  <Button
-                    size="icon"
-                    onClick={() => handleDeleteFolder(folder._id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="icon">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Delete this folder?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this folder? This will also delete all links inside this folder.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDeleteFolder(folder._id)}
+                        >
+                          Yes, delete folder
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               )
             })}
