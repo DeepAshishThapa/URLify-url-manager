@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
     try {
-       
+
         await dbConnect();
 
         //  Get current logged-in user session
@@ -25,15 +25,21 @@ export async function GET(req: NextRequest) {
         const userId = session.user._id;
 
         //  Get query params from URL
-        
+
         const { searchParams } = new URL(req.url);
         const folderId = searchParams.get("folderId");
+        const type = searchParams.get("type");
 
         // Default filter → return all links of user
         let filter: any = { userId };
 
+        // If type is unsaved → fetch only links without folder
+        if (type === "unsaved") {
+            filter.folderId = null;
+        }
+
         // If folderId exists → apply extra filtering
-        if (folderId) {
+        else if (folderId) {
 
             // 7.1 Validate MongoDB ObjectId format
             if (!mongoose.Types.ObjectId.isValid(folderId)) {
@@ -61,7 +67,7 @@ export async function GET(req: NextRequest) {
             filter.folderId = folderId;
         }
 
-        // Fetch links based on filter (all OR folder-specific)
+        // Fetch links based on filter (all OR folder-specific OR unsaved)
         const links = await linkModel
             .find(filter)
             .sort({ createdAt: -1 }); // newest first
@@ -70,9 +76,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
             {
                 data: links,
-                message: folderId
-                    ? "Folder links fetched successfully"
-                    : "Links fetched successfully",
+                message: type === "unsaved"
+                    ? "Unsaved links fetched successfully"
+                    : folderId
+                        ? "Folder links fetched successfully"
+                        : "Links fetched successfully",
             },
             { status: 200 }
         );
