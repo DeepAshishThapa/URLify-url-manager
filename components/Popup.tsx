@@ -47,12 +47,23 @@ type Folder = {
   name: string;
 };
 
+type Link = {
+  _id: string;
+  url: string;
+  description: string;
+  userId: string;
+  folderId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type PopupProps = {
   selectedFolder?: Folder | null;
   isAllPage?: boolean;
+  onLinkCreated?: (newLink: Link) => void;
 };
 
-function Popup({ selectedFolder, isAllPage = false }: PopupProps) {
+function Popup({ selectedFolder, isAllPage = false, onLinkCreated }: PopupProps) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | null>(null);
   const [folders, setFolders] = useState<Folder[]>([]);
@@ -114,7 +125,13 @@ function Popup({ selectedFolder, isAllPage = false }: PopupProps) {
             : data.folderId,
       };
 
-      await createLink(payload);
+      const response = await createLink(payload);
+
+      const newLink = response?.data || response?.link || response;
+
+      if (newLink && onLinkCreated) {
+        onLinkCreated(newLink);
+      }
 
       setStatus("success");
 
@@ -125,8 +142,6 @@ function Popup({ selectedFolder, isAllPage = false }: PopupProps) {
       });
     } catch (error) {
       console.error("Failed to create link:", error);
-
-      
       setStatus("error");
     }
   };
