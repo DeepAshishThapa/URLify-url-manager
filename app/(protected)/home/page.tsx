@@ -1,8 +1,10 @@
 "use client"
+
 import Popup from "@/components/Popup"
 import { getAllLinks } from "@/features/linkService/api"
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
+import { useSession } from "next-auth/react"
 
 import { deleteLink } from "@/features/linkService/api"
 
@@ -31,6 +33,8 @@ type Link = {
 }
 
 function page() {
+    const { status } = useSession()
+
     const [AllLinks, setAllLinks] = useState<Link[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -47,11 +51,13 @@ function page() {
     }
 
     useEffect(() => {
+        if (status !== "authenticated") return
+
         const fetchAllLinks = async () => {
             try {
+                setLoading(true)
                 const res = await getAllLinks()
-                setAllLinks(res.data)
-
+                setAllLinks(res.data || [])
             }
             catch (error) {
                 console.log(error)
@@ -61,8 +67,7 @@ function page() {
         }
 
         fetchAllLinks()
-
-    }, [])
+    }, [status])
 
     const getDomain = (url: string) => {
         try {
@@ -72,12 +77,20 @@ function page() {
         }
     }
 
+    if (status === "loading") {
+        return <div>Loading...</div>
+    }
+
     return (
         <>
             <div>
                 <p className="font-semibold text-2xl">All Links</p>
 
-                <Popup />
+                <Popup
+                    onLinkCreated={(newLink) => {
+                        setAllLinks((prevLinks) => [newLink, ...prevLinks])
+                    }}
+                />
 
                 <div className="mt-10 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
                     {loading ? (
@@ -175,9 +188,6 @@ function page() {
                     )}
                 </div>
             </div>
-
-
-
         </>
     )
 }

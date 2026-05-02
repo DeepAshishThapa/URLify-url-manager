@@ -77,7 +77,11 @@ function page() {
     return (
         <>
             <p className="font-semibold text-2xl">Unsaved Links</p>
-            <Popup />
+            <Popup
+                onLinkCreated={(newLink) => {
+                    setunsavedLinks((prevLinks) => [newLink, ...prevLinks])
+                }}
+            />
 
             {loading ? (
                 <div>...Loading</div>
