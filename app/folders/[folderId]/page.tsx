@@ -10,6 +10,22 @@ import { Card, CardContent } from "@/components/ui/card"
 
 import { getLinksByFolder } from "@/features/linkService/api"
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
+import { deleteLink } from "@/features/linkService/api"
+
+import { Button } from "@/components/ui/button"
+
 type Folder = {
     _id: string,
     name: string
@@ -37,6 +53,19 @@ function page() {
     const [loading, setLoading] = useState(true)
 
     const folderId = params.folderId as string
+
+    const handleDeleteLink = async (id: string) => {
+        try {
+            await deleteLink(id)
+
+            setFolderLinks((prevLinks) =>
+                prevLinks.filter((link) => link._id !== id)
+            )
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
 
     useEffect(() => {
         if (!folderId) return
@@ -78,7 +107,11 @@ function page() {
                 (
                     <div>
                         <p className="font-semibold text-2xl">{selectedFolder?.name}</p>
-                        <Popup selectedFolder={selectedFolder} />
+                        <Popup selectedFolder={selectedFolder}
+                            onLinkCreated={(newLink) => {
+                                setFolderLinks((prevLinks) => [newLink, ...prevLinks])
+                            }}
+                        />
 
                         <div className="mt-10 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4">
                             {FolderLinks.map((link) => (
@@ -126,14 +159,49 @@ function page() {
                                             )}
                                         </div>
 
-                                        <div className="pt-3 text-right">
+                                        <div className="pt-3 flex items-center justify-between">
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </AlertDialogTrigger>
+
+                                                <AlertDialogContent
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>
+                                                            Delete this link?
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This action cannot be undone. This link will be
+                                                            permanently deleted.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                                                        <AlertDialogAction
+                                                            onClick={() => handleDeleteLink(link._id)}
+                                                        >
+                                                            OK, delete
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+
                                             <span className="text-xs font-medium text-primary group-hover:underline">
                                                 Open link →
                                             </span>
                                         </div>
                                     </CardContent>
                                 </Card>
-
                             ))}
                         </div>
                     </div>
