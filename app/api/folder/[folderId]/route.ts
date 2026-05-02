@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import folderModel from "@/model/folder.model"
 import mongoose from "mongoose"
+import linkModel from "@/model/link.model"
 
 // Update folder name
 export async function PATCH(
@@ -123,6 +124,13 @@ export async function DELETE(
       )
     }
 
+     // STEP 1: delete all links inside this folder
+    await linkModel.deleteMany({
+      folderId,
+      userId: session.user._id,
+    })
+
+    // STEP 2: delete the folder
     await folderModel.findByIdAndDelete(folderId)
 
     return NextResponse.json(
