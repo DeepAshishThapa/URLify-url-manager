@@ -1,35 +1,42 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { signIn, useSession } from "next-auth/react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
+  const { status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/home")
+    }
+  }, [status, router])
 
   const handleGoogleLogin = async () => {
-    try {
-      setLoading(true)
-      await signIn("google", { callbackUrl: "/home" })
-    } catch (error) {
-      setLoading(false)
-    }
+    setLoading(true)
+    await signIn("google", {
+      callbackUrl: "/home",
+      redirect: true,
+    })
+  }
+
+  if (status === "loading" || status === "authenticated") {
+    return <p className="p-6 text-white">Checking session...</p>
   }
 
   return (
     <div className="w-full max-w-md p-8 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-2xl">
-
-      {/* Title */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-semibold text-white">
-          Welcome back
-        </h1>
+        <h1 className="text-2xl font-semibold text-white">Welcome back</h1>
         <p className="text-sm text-zinc-400 mt-2">
           Continue with Google to access your account
         </p>
       </div>
 
-      {/* Google Button */}
       <Button
         onClick={handleGoogleLogin}
         disabled={loading}
@@ -43,7 +50,6 @@ export default function LoginPage() {
 
         {loading ? "Redirecting..." : "Continue with Google"}
       </Button>
-
     </div>
   )
 }
