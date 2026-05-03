@@ -141,15 +141,15 @@
 <h2>📸 Screenshots</h2>
 
 <p>
-  <img src="./screenshots/first.png" width="600" alt="Dashboard">
+  <img src="./screenshot/first.png" width="600" alt="Dashboard">
 </p>
 
 <p>
-  <img src="./screenshots/second.png" width="600" alt="Folders">
+  <img src="./screenshot/second.png" width="600" alt="Folders">
 </p>
 
 <p>
-  <img src="./screenshots/third.png" width="600" alt="Login">
+  <img src="./screenshot/third.png" width="600" alt="Login">
 </p>
 
 <hr>
