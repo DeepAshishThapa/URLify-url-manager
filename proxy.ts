@@ -1,25 +1,39 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
+import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
 export const config = {
-  matcher: ["/home/:path*", "/folders/:path*", "/login", "/signup"],
+    matcher: ['/login', '/signup', '/home', '/folders/:folderid*', '/folders/unsaved', '/']
 }
 
 export async function proxy(request: NextRequest) {
-  const token = await getToken({
-    req: request,
-    secret: process.env.AUTH_SECRET,
-  })
+    const token = await getToken({ 
+        req: request,
+        secret: process.env.AUTH_SECRET,
+     })
+    const url = request.nextUrl
 
-  const pathname = request.nextUrl.pathname
+    // if loggedin block the pages
+    if (    
+        token &&
+        (url.pathname.startsWith('/login') ||
+            url.pathname.startsWith('/signup') ||
+            url.pathname === '/')
 
-  if (!token && (pathname.startsWith("/home") || pathname.startsWith("/folders"))) {
-    return NextResponse.redirect(new URL("/", request.url))
-  }
+    ) {
+        return NextResponse.redirect(new URL('/home', request.url));
 
-  if (token && (pathname === "/login" || pathname === "/signup")) {
-    return NextResponse.redirect(new URL("/home", request.url))
-  }
+    }
 
-  return NextResponse.next()
+    // if not logged in block 
+    if (
+        !token &&
+        (url.pathname.startsWith('/home') ||
+            url.pathname.startsWith('/folders'))
+
+    ) {
+        return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    return NextResponse.next()
+
 }
