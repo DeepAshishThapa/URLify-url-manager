@@ -23,9 +23,7 @@ export default function LandingPage() {
             <Link href="/login">Get Started</Link>
           </Button>
 
-          <Button asChild variant="outline" size="lg">
-            <Link href="/register">Create Account</Link>
-          </Button>
+          
         </div>
       </section>
 
