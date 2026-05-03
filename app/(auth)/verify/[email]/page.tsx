@@ -89,3 +89,10 @@
 
 
 
+export default function VerifyAccountPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <p>This verification page is currently disabled.</p>
+    </div>
+  )
+}
