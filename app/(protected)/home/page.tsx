@@ -77,6 +77,19 @@ function page() {
         }
     }
 
+    const getSafeUrl = (url: string) => {
+        if (!url) return "#"
+
+        if (
+            url.startsWith("http://") ||
+            url.startsWith("https://")
+        ) {
+            return url
+        }
+
+        return `https://${url}`
+    }
+
     if (status === "loading") {
         return <div>Loading...</div>
     }
@@ -100,10 +113,21 @@ function page() {
                             <Card
                                 key={link._id}
                                 className="group h-56 cursor-pointer rounded-xl border bg-background transition hover:shadow-lg w-full max-w-md"
-                                onClick={() => window.open(link.url, "_blank")}
+                                onClick={() =>
+                                    window.open(
+                                        getSafeUrl(link.url),
+                                        "_blank",
+                                        "noopener,noreferrer"
+                                    )
+                                }
                                 tabIndex={0}
                                 onKeyDown={(e) =>
-                                    e.key === "Enter" && window.open(link.url, "_blank")
+                                    e.key === "Enter" &&
+                                    window.open(
+                                        getSafeUrl(link.url),
+                                        "_blank",
+                                        "noopener,noreferrer"
+                                    )
                                 }
                             >
                                 <CardContent className="flex h-full flex-col justify-between p-4">
@@ -123,6 +147,7 @@ function page() {
                                             <p className="truncate text-sm font-semibold">
                                                 {getDomain(link.url)}
                                             </p>
+
                                             <p className="truncate text-xs text-muted-foreground">
                                                 {link.url}
                                             </p>
@@ -160,6 +185,7 @@ function page() {
                                                     <AlertDialogTitle>
                                                         Delete this link?
                                                     </AlertDialogTitle>
+
                                                     <AlertDialogDescription>
                                                         This action cannot be undone. This link will be
                                                         permanently deleted.
@@ -167,7 +193,9 @@ function page() {
                                                 </AlertDialogHeader>
 
                                                 <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogCancel>
+                                                        Cancel
+                                                    </AlertDialogCancel>
 
                                                     <AlertDialogAction
                                                         onClick={() => handleDeleteLink(link._id)}
@@ -178,9 +206,21 @@ function page() {
                                             </AlertDialogContent>
                                         </AlertDialog>
 
-                                        <span className="text-xs font-medium text-primary group-hover:underline">
-                                            Open link →
-                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+
+                                                window.open(
+                                                    getSafeUrl(link.url),
+                                                    "_blank",
+                                                    "noopener,noreferrer"
+                                                )
+                                            }}
+                                        >
+                                            Open Link
+                                        </Button>
                                     </div>
                                 </CardContent>
                             </Card>
