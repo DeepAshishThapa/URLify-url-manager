@@ -9,7 +9,7 @@
 <p align="center">
   URLify is a modern web application that allows users to save, organize, and manage links using a clean dashboard interface.
   <br>
-  <strong>Built to explore real-world authentication, protected routing, and scalable frontend architecture using Next.js.</strong>
+  <strong>Built to solve browser's messy, unorganized bookmark issue</strong>
 </p>
 
 <hr>
