@@ -114,13 +114,13 @@ function page() {
                                 key={link._id}
                                 className="group h-56 rounded-xl border bg-background transition hover:shadow-lg w-full max-w-md"
                             >
-                                <a
-                                    href={getSafeUrl(link.url)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block h-full"
-                                >
-                                    <CardContent className="flex h-full flex-col justify-between p-4">
+                                <CardContent className="flex h-full flex-col justify-between p-4">
+                                    <a
+                                        href={getSafeUrl(link.url)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block"
+                                    >
                                         <div className="flex items-center gap-3 mt-5">
                                             <img
                                                 src={`https://www.google.com/s2/favicons?domain=${getDomain(
@@ -155,62 +155,57 @@ function page() {
                                                 </p>
                                             )}
                                         </div>
+                                    </a>
 
-                                        <div className="pt-3 flex items-center justify-between">
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={(e) => {
-                                                            e.preventDefault()
-                                                            e.stopPropagation()
+                                    <div className="pt-3 flex items-center justify-between">
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </AlertDialogTrigger>
+
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>
+                                                        Delete this link?
+                                                    </AlertDialogTitle>
+
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This link will be
+                                                        permanently deleted.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>
+                                                        Cancel
+                                                    </AlertDialogCancel>
+
+                                                    <AlertDialogAction
+                                                        onClick={async () => {
+                                                            await handleDeleteLink(link._id)
                                                         }}
                                                     >
-                                                        Delete
-                                                    </Button>
-                                                </AlertDialogTrigger>
+                                                        OK, delete
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
 
-                                                <AlertDialogContent
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        e.stopPropagation()
-                                                    }}
-                                                >
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>
-                                                            Delete this link?
-                                                        </AlertDialogTitle>
-
-                                                        <AlertDialogDescription>
-                                                            This action cannot be undone. This link will be
-                                                            permanently deleted.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>
-                                                            Cancel
-                                                        </AlertDialogCancel>
-
-                                                        <AlertDialogAction
-                                                            onClick={(e) => {
-                                                                e.preventDefault()
-                                                                handleDeleteLink(link._id)
-                                                            }}
-                                                        >
-                                                            OK, delete
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-
-                                            <span className="text-xs font-medium text-primary group-hover:underline">
-                                                Open link →
-                                            </span>
-                                        </div>
-                                    </CardContent>
-                                </a>
+                                        <a
+                                            href={getSafeUrl(link.url)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs font-medium text-primary group-hover:underline"
+                                        >
+                                            Open link →
+                                        </a>
+                                    </div>
+                                </CardContent>
                             </Card>
                         ))
                     )}
